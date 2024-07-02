@@ -6,14 +6,16 @@ use swc_core::ecma::{
     visit::{as_folder, FoldWith, VisitMut},
 };
 use swc_core::ecma::ast::*;
-use swc_ecma_parser::{Syntax, TsConfig};
+use swc_ecma_parser::{Syntax};
 use swc_core::ecma::visit::{Fold, VisitMutWith};
 use swc_core::plugin::{plugin_transform, proxies::TransformPluginProgramMetadata};
 
 pub struct AddSymbols;
 
-fn class_method(name: &str, body: Vec<Option<ExprOrSpread>>) -> ClassProp {
-    ClassProp {
+
+fn class_method(name: &str, body: Vec<Stmt>) -> ClassMethod {
+    ClassMethod {
+        span: Default::default(),
         key: PropName::Computed(ComputedPropName {
             span: DUMMY_SP,
             expr: Box::new(Expr::Call(CallExpr {
@@ -34,21 +36,25 @@ fn class_method(name: &str, body: Vec<Option<ExprOrSpread>>) -> ClassProp {
                 type_args: None,
             })),
         }),
-        value: Some(Box::new(Expr::Array(ArrayLit {
+        function: Box::new(Function {
+            params: vec![],
+            decorators: vec![],
             span: DUMMY_SP,
-            elems: body,
-        }))),
-        type_ann: None,
+            body: Some(BlockStmt {
+                span: DUMMY_SP,
+                stmts: body,
+            }),
+            is_async: false,
+            is_generator: false,
+            type_params: None,
+            return_type: None,
+        }),
         is_static: true,
-        decorators: vec![],
-        span: DUMMY_SP,
         accessibility: None,
         is_abstract: false,
         is_optional: false,
         is_override: false,
-        readonly: false,
-        declare: false,
-        definite: false,
+        kind: MethodKind::Getter,
     }
 }
 
@@ -85,14 +91,70 @@ impl TransformVisitor {
         for member in &class.body {
             if let ClassMember::Constructor(constructor) = member {
                 for param in &constructor.params {
-                    if let ParamOrTsParamProp::Param(param) = param {
-                        if let Pat::Ident(ident) = &param.pat {
-                            if let Some(type_ann) = &ident.type_ann {
-                                if let TsType::TsTypeRef(type_ref) = &*type_ann.type_ann {
-                                    if let TsEntityName::Ident(ident) = &type_ref.type_name {
-                                        ctor_args.push(ident.sym.to_string());
+                    match param {
+                        ParamOrTsParamProp::TsParamProp(ts_param_prop) => {
+                            if let TsParamPropParam::Ident(ident) = &ts_param_prop.param {
+                                if let Some(type_ann) = &ident.type_ann {
+                                    if let TsType::TsTypeRef(type_ref) = &*type_ann.type_ann {
+                                        if let TsEntityName::Ident(ident) = &type_ref.type_name {
+                                            ctor_args.push(ident.sym.to_string());
+                                        }
                                     }
                                 }
+                            }
+                        },
+                        ParamOrTsParamProp::Param(param) => {
+                            match &param.pat {
+                                Pat::Ident(ident) => {
+                                    if let Some(type_ann) = &ident.type_ann {
+                                        if let TsType::TsTypeRef(type_ref) = &*type_ann.type_ann {
+                                            if let TsEntityName::Ident(ident) = &type_ref.type_name {
+                                                ctor_args.push(ident.sym.to_string());
+                                            }
+                                        }
+                                    }
+                                },
+                                Pat::Array(array_pat) => {
+                                    for elem in &array_pat.elems {
+                                        if let Some(Pat::Ident(ident)) = elem {
+                                            if let Some(type_ann) = &ident.type_ann {
+                                                if let TsType::TsTypeRef(type_ref) = &*type_ann.type_ann {
+                                                    if let TsEntityName::Ident(ident) = &type_ref.type_name {
+                                                        ctor_args.push(ident.sym.to_string());
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                Pat::Object(object_pat) => {
+                                    for prop in &object_pat.props {
+                                        match prop {
+                                            ObjectPatProp::KeyValue(key_value) => {
+                                                if let Pat::Ident(ident) = (*(&key_value.value).clone()) {
+                                                    if let Some(type_ann) = &ident.type_ann {
+                                                        if let TsType::TsTypeRef(type_ref) = &*type_ann.type_ann {
+                                                            if let TsEntityName::Ident(ident) = &type_ref.type_name {
+                                                                ctor_args.push(ident.sym.to_string());
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            // ObjectPatProp::Assign(assign) => {
+                                            //     if let Some(type_ann) = &assign.value.type_ann {
+                                            //         if let TsType::TsTypeRef(type_ref) = &*type_ann.type_ann {
+                                            //             if let TsEntityName::Ident(ident) = &type_ref.type_name {
+                                            //                 ctor_args.push(ident.sym.to_string());
+                                            //             }
+                                            //         }
+                                            //     }
+                                            // },
+                                            _ => {}
+                                        }
+                                    }
+                                },
+                                _ => {}
                             }
                         }
                     }
@@ -100,47 +162,44 @@ impl TransformVisitor {
             }
         }
 
-        // Create the new symbol properties
-        let ctor_args_prop = class_method(
+
+        // Create the new symbol methods
+        let ctor_args_method = class_method(
             "___CTOR_ARGS___",
-            vec![
-                Some(ExprOrSpread {
-                    spread: None,
-                    expr: Box::new(Expr::Array(ArrayLit {
-                        span: DUMMY_SP,
-                        elems: ctor_args
-                            .into_iter()
-                            .map(|arg| Some(ExprOrSpread {
-                                spread: None,
-                                expr: Box::new(Expr::Lit(Lit::Str(Str {
-                                    span: DUMMY_SP,
-                                    value: arg.into(),
-                                    raw: None,
-                                }))),
-                            }))
-                            .collect(),
-                    })),
-                }),
-            ],
+            vec![Stmt::Return(ReturnStmt {
+                span: DUMMY_SP,
+                arg: Some(Box::new(Expr::Array(ArrayLit {
+                    span: DUMMY_SP,
+                    elems: ctor_args
+                        .into_iter()
+                        .map(|arg| Some(ExprOrSpread {
+                            spread: None,
+                            expr: Box::new(Expr::Lit(Lit::Str(Str {
+                                span: DUMMY_SP,
+                                value: arg.into(),
+                                raw: None,
+                            }))),
+                        }))
+                        .collect(),
+                }))),
+            })],
         );
 
-        let ctor_name_prop = class_method(
+        let ctor_name_method = class_method(
             "___CTOR_NAME___",
-            vec![
-                Some(ExprOrSpread {
-                    spread: None,
-                    expr: Box::new(Expr::Lit(Lit::Str(Str {
-                        span: DUMMY_SP,
-                        value: class_name.into(),
-                        raw: None,
-                    }))),
-                }),
-            ],
+            vec![Stmt::Return(ReturnStmt {
+                span: DUMMY_SP,
+                arg: Some(Box::new(Expr::Lit(Lit::Str(Str {
+                    span: DUMMY_SP,
+                    value: class_name.into(),
+                    raw: None,
+                })))),
+            })],
         );
 
         // Add the new properties to the class
-        class.body.push(ClassMember::ClassProp(ctor_args_prop));
-        class.body.push(ClassMember::ClassProp(ctor_name_prop));
+        class.body.push(ClassMember::Method(ctor_args_method));
+        class.body.push(ClassMember::Method(ctor_name_method));
     }
 }
 
