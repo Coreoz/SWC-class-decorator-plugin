@@ -68,14 +68,14 @@ impl VisitMut for TransformVisitor {
     fn visit_mut_class_decl(&mut self, class_decl: &mut ClassDecl) {
         // Get the class name from ClassDecl
         let class_name = class_decl.ident.sym.to_string();
-        println!("visit_mut_class_decl");
-        // self.process_class(&mut class_decl.class, Some(class_name));
+        println!("visit_mut_class_decl {}", class_name);
+        self.process_class(&mut class_decl.class, Some(class_name));
     }
 
     fn visit_mut_class_expr(&mut self, class_expr: &mut ClassExpr) {
         // Get the class name from ClassExpr if it has one
         let class_name = class_expr.ident.as_ref().map(|ident| ident.sym.to_string());
-        println!("visit_mut_class_expr");
+        println!("visit_mut_class_expr {:?}", class_name);
         self.process_class(&mut class_expr.class, class_name);
     }
 }
@@ -92,11 +92,11 @@ impl TransformVisitor {
         let mut ctor_args = vec![];
         for member in &class.body {
             if let ClassMember::Constructor(constructor) = member {
-                println!("ClassMember::Constructor");
+                println!("ClassMember::Constructor {:?}", member);
                 for param in &constructor.params {
                     match param {
                         ParamOrTsParamProp::TsParamProp(ts_param_prop) => {
-                            println!("ParamOrTsParamProp::TsParamProp");
+                            println!("ParamOrTsParamProp::TsParamProp {:?}", ts_param_prop);
                             if let TsParamPropParam::Ident(ident) = &ts_param_prop.param {
                                 if let Some(type_ann) = &ident.type_ann {
                                     if let TsType::TsTypeRef(type_ref) = &*type_ann.type_ann {
@@ -108,7 +108,7 @@ impl TransformVisitor {
                             }
                         },
                         ParamOrTsParamProp::Param(param) => {
-                            println!("ParamOrTsParamProp::Param");
+                            println!("ParamOrTsParamProp::Param {:?}", param);
                             match &param.pat {
                                 Pat::Ident(ident) => {
                                     if let Some(type_ann) = &ident.type_ann {
