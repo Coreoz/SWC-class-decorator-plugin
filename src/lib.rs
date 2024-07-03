@@ -68,12 +68,14 @@ impl VisitMut for TransformVisitor {
     fn visit_mut_class_decl(&mut self, class_decl: &mut ClassDecl) {
         // Get the class name from ClassDecl
         let class_name = class_decl.ident.sym.to_string();
-        self.process_class(&mut class_decl.class, Some(class_name));
+        println!("visit_mut_class_decl");
+        // self.process_class(&mut class_decl.class, Some(class_name));
     }
 
     fn visit_mut_class_expr(&mut self, class_expr: &mut ClassExpr) {
         // Get the class name from ClassExpr if it has one
         let class_name = class_expr.ident.as_ref().map(|ident| ident.sym.to_string());
+        println!("visit_mut_class_expr");
         self.process_class(&mut class_expr.class, class_name);
     }
 }
@@ -90,9 +92,11 @@ impl TransformVisitor {
         let mut ctor_args = vec![];
         for member in &class.body {
             if let ClassMember::Constructor(constructor) = member {
+                println!("ClassMember::Constructor");
                 for param in &constructor.params {
                     match param {
                         ParamOrTsParamProp::TsParamProp(ts_param_prop) => {
+                            println!("ParamOrTsParamProp::TsParamProp");
                             if let TsParamPropParam::Ident(ident) = &ts_param_prop.param {
                                 if let Some(type_ann) = &ident.type_ann {
                                     if let TsType::TsTypeRef(type_ref) = &*type_ann.type_ann {
@@ -104,6 +108,7 @@ impl TransformVisitor {
                             }
                         },
                         ParamOrTsParamProp::Param(param) => {
+                            println!("ParamOrTsParamProp::Param");
                             match &param.pat {
                                 Pat::Ident(ident) => {
                                     if let Some(type_ann) = &ident.type_ann {
@@ -115,6 +120,7 @@ impl TransformVisitor {
                                     }
                                 },
                                 Pat::Array(array_pat) => {
+                                    println!("Pat::Array");
                                     for elem in &array_pat.elems {
                                         if let Some(Pat::Ident(ident)) = elem {
                                             if let Some(type_ann) = &ident.type_ann {
@@ -128,6 +134,7 @@ impl TransformVisitor {
                                     }
                                 },
                                 Pat::Object(object_pat) => {
+                                    println!("Pat::Object");
                                     for prop in &object_pat.props {
                                         match prop {
                                             ObjectPatProp::KeyValue(key_value) => {
@@ -227,49 +234,20 @@ test!(
     Syntax::Typescript(Default::default()),
     |_| as_folder(TransformVisitor),
     boo,
-    r#"import CollaboratorsApi from '@api/collaborator/CollaboratorsApi';
-import SsrBrowserObservableManager
-  from '@services/ssr/SsrBrowserObservableManager';
-import { Observable } from 'micro-observables';
-import { SsrObservableContent, SsrWritableObservable } from 'plume-ssr-browser';
-import { HttpPromise } from 'simple-http-rest-client';
-import { CollaboratorPhoto } from '../../types/collaborator/collaborators.type';
-import { SsrObservableKey } from '../../types/ssr/SsrTypes';
+    r#"class SampleApi {}
 
-class CollaboratorService {
-
-  private photos: SsrWritableObservable<CollaboratorPhoto[], SsrObservableKey>;
-
-  constructor(
-    protected readonly collaboratorsApi: CollaboratorsApi,
-    private readonly observableManager: SsrBrowserObservableManager,
-  ) {
-    this.photos = observableManager.observable('collaborator-photos');
+/**
+ * A sample Service that can be copied.
+ * After it has been copied, this file should be deleted :)
+ */
+export default class SampleService {
+  constructor(private readonly sampleApi: SampleApi) {
   }
 
-  fetchCollaboratorsPhoto(): HttpPromise<void> {
-    return this.collaboratorsApi
-      .fetchCollaboratorsPhoto()
-      .then((collaboratorPhotos: CollaboratorPhoto[]) => {
-        this.photos.set({
-          data: collaboratorPhotos,
-          config: {},
-        });
-      })
-      .catch(() => {
-        this.photos.set({
-          data: [],
-          config: {},
-        });
-      });
-  }
-
-  getPhotos(): Observable<SsrObservableContent<CollaboratorPhoto[], SsrObservableKey> | undefined> {
-    return this.photos.readOnly();
+  sayHello(name: string) {
+    return this.sampleApi.sample(name);
   }
 }
-
-export default CollaboratorService;
 "#
 );
 
