@@ -1,7 +1,8 @@
 [package]
-name = "swc-class-decorator-plugin"
+name = "swc_class_decorator"
 version = "0.1.0"
 edition = "2021"
+include = ["Cargo.toml", "src/**/*.rs"]
 
 [lib]
 crate-type = ["cdylib"]
@@ -11,9 +12,9 @@ lto = true
 
 [dependencies]
 serde = { version = "1.0.218" }
-serde_json = { version = "1.0.140" }
 swc_core = { version = "16.0.0", features = ["ecma_plugin_transform"] }
-swc_class_decorator = { path = "./transform" }
+swc_ecma_parser = { version = "10.0.0" }
+swc_ecma_utils = { version = "11.0.0" }
 
 # .cargo/config.toml defines few alias to build plugin.
 # cargo build-wasi generates wasm-wasi32 binary

@@ -22,7 +22,7 @@ bin/
 .README.md.html
 
 /target
-
+transform/target
 # Intellij
 .idea/
 *.iml
