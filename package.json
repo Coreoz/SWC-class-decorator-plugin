@@ -12,7 +12,7 @@
   "main": "target/wasm32-wasip1/release/swc_class_decorator_plugin.wasm",
   "scripts": {
     "build": "cargo build-wasi --release",
-    "test": "cargo test"
+    "test": "cargo test --package swc_class_decorator --lib tests"
   },
   "files": ["src/*", "transform/src/*"],
   "preferUnplugged": true,
