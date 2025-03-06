@@ -1,5 +1,7 @@
-swc-class-ctor-decorator
-========================
+SWC-class-decorator-plugin
+==========================
+
+TODO description, installation, usage
 
 Build plugin
 ------------
