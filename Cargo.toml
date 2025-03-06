@@ -1,5 +1,5 @@
 [package]
-name = "swc-class-ctor-decorator"
+name = "swc-class-decorator-plugin"
 version = "0.1.0"
 edition = "2021"
 
