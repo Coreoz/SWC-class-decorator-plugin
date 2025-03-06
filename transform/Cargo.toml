@@ -4,12 +4,6 @@ version = "0.1.0"
 edition = "2021"
 include = ["Cargo.toml", "src/**/*.rs"]
 
-[lib]
-crate-type = ["cdylib"]
-
-[profile.release]
-lto = true
-
 [dependencies]
 serde = { version = "1.0.218" }
 swc_core = { version = "16.0.0", features = ["ecma_plugin_transform"] }

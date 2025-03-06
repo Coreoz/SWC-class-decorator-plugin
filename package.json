@@ -2,10 +2,10 @@
     "name": "swc-class-decorator-plugin",
     "version": "0.1.0",
     "description": "",
-    "author": "",
+    "author": "Malo",
     "license": "ISC",
     "keywords": ["swc-plugin"],
-    "main": "target/wasm32-wasi/release/swc_class_decorator_plugin.wasm",
+    "main": "target/wasm32-wasip1/release/swc_class_decorator_plugin.wasm",
     "scripts": {
         "prepublishOnly": "cargo build-wasi --release"
     },

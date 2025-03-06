@@ -1,8 +1,6 @@
-use serde::Deserialize;
 use serde_json::from_str;
 use swc_class_decorator::{Config, TransformVisitor};
 use swc_core::ecma::ast::Program;
-use swc_core::ecma::ast::*;
 use swc_core::ecma::visit::VisitMutWith;
 use swc_core::plugin::{plugin_transform, proxies::TransformPluginProgramMetadata};
 
@@ -26,9 +24,9 @@ pub fn process_transform(mut program: Program, data: TransformPluginProgramMetad
     let config = from_str::<Config>(
         &data
             .get_transform_plugin_config()
-            .expect("failed to get plugin config for swc-class-ctor-decorator"),
+            .expect("failed to get plugin config for swc-class-decorator-plugin"),
     )
-    .expect("invalid config for swc-class-ctor-decorator, please check your configuration");
+    .expect("invalid config for swc-class-decorator-plugin, please check your configuration");
 
     program.visit_mut_with(&mut TransformVisitor { config });
     program

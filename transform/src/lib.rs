@@ -18,7 +18,7 @@ enum LogLevel {
 pub struct Config {
     // Add any configuration fields here
     #[serde(default)]
-    debug: LogLevel,
+    log: LogLevel,
 }
 
 pub struct TransformVisitor {
@@ -36,14 +36,14 @@ impl VisitMut for TransformVisitor {
         self.process_class(
             &mut class_decl.class,
             Some(class_name),
-            self.config.debug.clone(),
+            self.config.log.clone(),
         );
     }
 
     fn visit_mut_class_expr(&mut self, class_expr: &mut ClassExpr) {
         // Get the class name from ClassExpr if it has one
         let class_name = class_expr.ident.as_ref().map(|ident| ident.sym.to_string());
-        self.process_class(&mut class_expr.class, class_name, self.config.debug.clone());
+        self.process_class(&mut class_expr.class, class_name, self.config.log.clone());
     }
 }
 
@@ -168,7 +168,7 @@ impl TransformVisitor {
         match debug {
             LogLevel::Debug => {
                 println!(
-                    "\nswc-class-ctor-decorator - Processing class : {}, found constructor arguments : [{}] \n ------------------ \n {:?}\n",
+                    "\nswc-class-decorator-plugin - Processing class : {}, found constructor arguments : [{}] \n ------------------ \n {:?}\n",
                     class_name,
                     ctor_args.join(", "),
                     class
@@ -176,7 +176,7 @@ impl TransformVisitor {
             }
             LogLevel::Info => {
                 println!(
-                    "swc-class-ctor-decorator - Processing class : {}, found constructor arguments : [{}]",
+                    "swc-class-decorator-plugin - Processing class : {}, found constructor arguments : [{}]",
                     class_name,
                     ctor_args.join(", ")
                 );
