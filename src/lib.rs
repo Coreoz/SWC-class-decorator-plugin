@@ -19,8 +19,11 @@ use swc_core::plugin::{plugin_transform, proxies::TransformPluginProgramMetadata
 ///
 /// This requires manual handling of serialization / deserialization from ptrs.
 /// Refer swc_plugin_macro to see how does it work internally.
+
+/// Plugin entry point for swc_class_decorator_plugin
 #[plugin_transform]
 pub fn process_transform(mut program: Program, data: TransformPluginProgramMetadata) -> Program {
+    // Get and parse the configuration
     let config = from_str::<Config>(
         &data
             .get_transform_plugin_config()
@@ -28,6 +31,7 @@ pub fn process_transform(mut program: Program, data: TransformPluginProgramMetad
     )
     .expect("invalid config for swc-class-decorator-plugin, please check your configuration");
 
+    // Redirect to transform/src/lib.rs and apply the transformation
     program.visit_mut_with(&mut TransformVisitor { config });
     program
 }

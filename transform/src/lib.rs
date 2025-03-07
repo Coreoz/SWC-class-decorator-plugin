@@ -47,13 +47,25 @@ impl VisitMut for TransformVisitor {
     }
 }
 
+///
+///
+/// # Arguments
+///
+/// * `name`: the name of the decorator (either '___CTOR_ARGS___' or '___CTOR_NAME___')
+/// * `body`: the body of the class method
+///
+/// returns: ClassMethod
+///
 fn class_method(name: &str, body: Vec<Stmt>) -> ClassMethod {
+    // Create a getter method with a computed property name
     ClassMethod {
         span: Default::default(),
+        // key is the function name
         key: PropName::Computed(ComputedPropName {
             span: DUMMY_SP,
             expr: Box::new(Expr::Call(CallExpr {
                 span: DUMMY_SP,
+                // Concatenation of 'Symbol.for' and the name of the decorator
                 callee: Callee::Expr(Box::new(Expr::Member(MemberExpr {
                     span: DUMMY_SP,
                     obj: Box::new(Expr::Ident(Ident {
@@ -74,6 +86,7 @@ fn class_method(name: &str, body: Vec<Stmt>) -> ClassMethod {
                 ..Default::default()
             })),
         }),
+        // Function body
         function: Box::new(Function {
             params: vec![],
             body: Some(BlockStmt {
@@ -93,7 +106,16 @@ fn class_method(name: &str, body: Vec<Stmt>) -> ClassMethod {
     }
 }
 
+///
+///
+/// # Arguments
+///
+/// * `type_ann`: the type annotation of the parameter (typescript type)
+///
+/// returns: Option<String>
+///
 fn extract_ident_type_ann(type_ann: &Option<Box<TsTypeAnn>>) -> Option<String> {
+    // Check if exists and extract the type name
     if let Some(type_ann) = type_ann {
         if let TsType::TsTypeRef(type_ref) = &*type_ann.type_ann {
             if let TsEntityName::Ident(ident) = &type_ref.type_name {
@@ -105,6 +127,15 @@ fn extract_ident_type_ann(type_ann: &Option<Box<TsTypeAnn>>) -> Option<String> {
 }
 
 impl TransformVisitor {
+    /// 
+    /// 
+    /// # Arguments 
+    /// 
+    /// * `class`: The class file to process
+    /// * `class_name`: The name of the class
+    /// * `debug`: Whether to print debug information
+    /// 
+    /// 
     fn process_class(&self, class: &mut Class, class_name: Option<String>, debug: LogLevel) {
         if class_name.is_none() {
             return;
@@ -115,12 +146,15 @@ impl TransformVisitor {
         // Find the constructor and its parameter types
         let mut ctor_args = vec![];
         for member in &class.body {
+            // Find the constructor in the class body
             if let ClassMember::Constructor(constructor) = member {
                 for param in &constructor.params {
+                    // If found, extract the parameter type, depending on the type of parameter
                     match param {
                         ParamOrTsParamProp::TsParamProp(ts_param_prop) => {
                             if let TsParamPropParam::Ident(ident) = &ts_param_prop.param {
                                 if let Some(ident_type) = extract_ident_type_ann(&ident.type_ann) {
+                                    // Add the type to the list of constructor arguments
                                     ctor_args.push(ident_type);
                                 }
                             }
@@ -187,6 +221,7 @@ impl TransformVisitor {
         // Create the new symbol methods
         let ctor_args_method = class_method(
             "___CTOR_ARGS___",
+            // Concatenate the arguments into an array of strings
             vec![Stmt::Return(ReturnStmt {
                 span: DUMMY_SP,
                 arg: Some(Box::new(Expr::Array(ArrayLit {
@@ -210,6 +245,7 @@ impl TransformVisitor {
 
         let ctor_name_method = class_method(
             "___CTOR_NAME___",
+            // Return the class name
             vec![Stmt::Return(ReturnStmt {
                 span: DUMMY_SP,
                 arg: Some(Box::new(Expr::Lit(Lit::Str(Str {
@@ -220,6 +256,7 @@ impl TransformVisitor {
             })],
         );
 
+        // Push the new methods to the class body
         class.body.push(ClassMember::Method(ctor_args_method));
         class.body.push(ClassMember::Method(ctor_name_method));
     }
