@@ -12,11 +12,29 @@
   "main": "target/wasm32-wasip1/release/swc_class_decorator_plugin.wasm",
   "scripts": {
     "build": "cargo build-wasi --release",
+    "clean": "rm -rf target",
+    "prepare-release": "yarn clean && yarn build",
     "test": "cargo test --package swc_class_decorator --lib tests"
   },
-  "files": ["src/*", "transform/src/*"],
+  "files": [
+    "src/*",
+    "transform/src/*"
+  ],
+  "devDependencies": {
+    "release-it": "^18.1.2"
+  },
   "preferUnplugged": true,
   "engines": {
-    "rust": "1.85.0"
+    "node": "20.18.3"
+  },
+  "release-it": {
+    "hooks": {
+      "before:init": [
+        "yarn prepare-release"
+      ]
+    }
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
