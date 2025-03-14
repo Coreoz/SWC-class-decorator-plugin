@@ -84,6 +84,13 @@ plugins: [['swc-class-decorator-plugin', { log: "Info" | "Debug" }]]
 
 That's it, your classes will be transformed to add the needed information for dependency injection.
 
+Development configuration
+-------------------------
+To work on this plugin, a sample project must be used.
+Referencing the plugin in the sample project can be done with Yarn in the sample project using:
+1. `yarn link /local/path/to/swc-class-decorator-plugin`
+2. `yarn add -D swc-class-decorator-plugin@*`
+
 Build plugin
 ------------
 `yarn build`
@@ -94,7 +101,6 @@ Run tests
 
 Structure
 ---------
-
 Entry point: `src/lib.rs`
 
 It uses the `plugin_transform` from `swc_core` to transform the class, and then redirect to `transform/src/lib.rs` to
