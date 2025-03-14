@@ -1,22 +1,37 @@
 {
   "name": "swc-class-decorator-plugin",
   "version": "0.1.0",
-  "description": "SWC plugin for class decorators used by plume-ts-di npm lib",
-  "author": "https://coreoz.com",
+  "description": "SWC plugin for class decorators used by plume-ts-di",
+  "author": "Aurélien Manteaux <amanteaux@coreoz.com> (https://coreoz.com)",
+  "contributors": [
+    "Malo Le Corvec <mlecorvec@coreoz.com> (https://coreoz.com)",
+    "Vincent Dubois <vdubois@coreoz.com> (https://coreoz.com)"
+  ],
   "repository": "https://github.com/Coreoz/SWC-class-decorator-plugin.git",
   "homepage": "https://github.com/Coreoz/SWC-class-decorator-plugin",
   "license": "Apache-2.0",
   "keywords": [
-    "swc-plugin"
+    "swc-plugin",
+    "typescript",
+    "dependency injection",
+    "plume-ts-di"
   ],
   "main": "target/wasm32-wasip1/release/swc_class_decorator_plugin.wasm",
   "scripts": {
     "build": "cargo build-wasi --release",
-    "test": "cargo test --package swc_class_decorator --lib tests"
+    "test": "cargo test --package swc_class_decorator_plugin --lib tests",
+    "release": "release-it"
   },
-  "files": ["src/*", "transform/src/*"],
+  "devDependencies": {
+    "release-it": "^18.1.2"
+  },
+  "files": [
+    "src/*",
+    "transform/src/*"
+  ],
   "preferUnplugged": true,
   "engines": {
     "rust": "1.85.0"
-  }
+  },
+  "packageManager": "yarn@4.7.0"
 }
