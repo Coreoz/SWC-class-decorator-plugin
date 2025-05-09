@@ -3,7 +3,7 @@ SWC-class-decorator-plugin
 
 ## Description
 
-This is a WASM plugin for Vite with the help of [vite-react-swc](https://github.com/vitejs/vite-plugin-react-swc) plugin
+This is a [SWC](https://github.com/swc-project/swc) WASM plugin for Vite with the help of [vite-react-swc](https://github.com/vitejs/vite-plugin-react-swc) plugin
 that adds [plume-ts-di](https://github.com/Coreoz/plume-ts-di) needed decorators for dependency injection.
 
 Class files are transformed to add the class name and the dependencies for the dependency injection to work.
