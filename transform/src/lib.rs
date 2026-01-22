@@ -2,7 +2,6 @@ use serde::Deserialize;
 use swc_core::common::DUMMY_SP;
 use swc_core::ecma::ast::*;
 use swc_core::ecma::visit::VisitMut;
-use swc_core::ecma::visit::VisitMutWith;
 use swc_ecma_utils::ExprFactory;
 
 #[derive(Debug, Default, Clone, Deserialize)]
@@ -127,15 +126,15 @@ fn extract_ident_type_ann(type_ann: &Option<Box<TsTypeAnn>>) -> Option<String> {
 }
 
 impl TransformVisitor {
-    /// 
-    /// 
-    /// # Arguments 
-    /// 
+    ///
+    ///
+    /// # Arguments
+    ///
     /// * `class`: The class file to process
     /// * `class_name`: The name of the class
     /// * `debug`: Whether to print debug information
-    /// 
-    /// 
+    ///
+    ///
     fn process_class(&self, class: &mut Class, class_name: Option<String>, debug: LogLevel) {
         if class_name.is_none() {
             return;

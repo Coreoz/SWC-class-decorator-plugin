@@ -1,6 +1,6 @@
 [package]
 name = "swc_class_decorator_plugin"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 
 [lib]
@@ -10,9 +10,9 @@ crate-type = ["cdylib"]
 lto = true
 
 [dependencies]
-serde = { version = "1.0.218" }
-serde_json = { version = "1.0.140" }
-swc_core = { version = "16.0.0", features = ["ecma_plugin_transform"] }
+serde = { version = "1.0.228" }
+serde_json = { version = "1.0.149" }
+swc_core = { version = "55.0.2", features = ["ecma_plugin_transform"] }
 swc_class_decorator = { path = "./transform" }
 
 # .cargo/config.toml defines few alias to build plugin.
