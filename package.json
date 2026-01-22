@@ -1,6 +1,6 @@
 {
   "name": "swc-class-decorator-plugin",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "SWC plugin for class decorators used by plume-ts-di npm lib",
   "author": "Aurélien Manteaux <amanteaux@coreoz.com> (https://coreoz.com)",
   "contributors": [
