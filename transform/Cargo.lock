@@ -1234,7 +1234,7 @@ dependencies = [
 
 [[package]]
 name = "swc_class_decorator"
-version = "0.2.0"
+version = "1.2.0"
 dependencies = [
  "serde",
  "swc_core",

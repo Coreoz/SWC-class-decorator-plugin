@@ -24,6 +24,7 @@
     "release": "yarn clean && yarn build"
   },
   "devDependencies": {
+    "@release-it/bumper": "^8.0.1",
     "release-it": "^21.1.0"
   },
   "files": [
@@ -38,7 +39,25 @@
     "hooks": {
       "before:init": [
         "yarn release"
+      ],
+      "after:bump": [
+        "cargo metadata --manifest-path Cargo.toml --format-version 1 > /dev/null",
+        "cargo metadata --manifest-path transform/Cargo.toml --format-version 1 > /dev/null"
       ]
+    },
+    "plugins": {
+      "@release-it/bumper": {
+        "out": [
+          {
+            "file": "Cargo.toml",
+            "path": "package.version"
+          },
+          {
+            "file": "transform/Cargo.toml",
+            "path": "package.version"
+          }
+        ]
+      }
     }
   },
   "publishConfig": {
