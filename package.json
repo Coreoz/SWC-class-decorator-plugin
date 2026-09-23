@@ -20,11 +20,11 @@
   "scripts": {
     "build": "cargo build-wasi --release",
     "clean": "rm -rf target",
-    "test": "cargo test --package swc_class_decorator_plugin --lib tests",
+    "test": "cargo test --manifest-path transform/Cargo.toml",
     "release": "yarn clean && yarn build"
   },
   "devDependencies": {
-    "release-it": "^18.1.2"
+    "release-it": "^21.1.0"
   },
   "files": [
     "src/*",
