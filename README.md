@@ -51,7 +51,7 @@ export default class SampleService {
 
 ## Installation
 
-Minimum requirements: `@vitejs/plugin-react-swc@3.8.0`
+Minimum requirements: `@vitejs/plugin-react-swc@4.0.0` (brings `@swc/core` >= 1.15)
 
 `yarn add -D swc-class-decorator-plugin`
 

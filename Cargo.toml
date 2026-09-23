@@ -10,9 +10,9 @@ crate-type = ["cdylib"]
 lto = true
 
 [dependencies]
-serde = { version = "1.0.228" }
-serde_json = { version = "1.0.149" }
-swc_core = { version = "55.0.2", features = ["ecma_plugin_transform"] }
+serde = { version = "1.0.229" }
+serde_json = { version = "1.0.151" }
+swc_core = { version = "80.0.0", features = ["ecma_plugin_transform"] }
 swc_class_decorator = { path = "./transform" }
 
 # .cargo/config.toml defines few alias to build plugin.

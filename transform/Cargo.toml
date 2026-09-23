@@ -5,10 +5,10 @@ edition = "2021"
 include = ["Cargo.toml", "src/**/*.rs"]
 
 [dependencies]
-serde = { version = "1.0.228" }
-swc_core = { version = "55.0.2", features = ["ecma_plugin_transform"] }
-swc_ecma_parser = { version = "33.0.0" }
-swc_ecma_utils = { version = "26.0.1" }
+serde = { version = "1.0.229" }
+swc_core = { version = "80.0.0", features = ["ecma_plugin_transform", "ecma_transforms", "testing_transform"] }
+swc_ecma_parser = { version = "45.1.4", features = ["typescript"] }
+swc_ecma_utils = { version = "35.0.2" }
 
 # .cargo/config.toml defines few alias to build plugin.
 # cargo build-wasi generates wasm-wasi32 binary

@@ -88,7 +88,7 @@ fn class_method(name: &str, body: Vec<Stmt>) -> ClassMethod {
         // Function body
         function: Box::new(Function {
             params: vec![],
-            body: Some(BlockStmt {
+            body: Some(FunctionBody {
                 stmts: body,
                 ..Default::default()
             }),
@@ -151,11 +151,16 @@ impl TransformVisitor {
                     // If found, extract the parameter type, depending on the type of parameter
                     match param {
                         ParamOrTsParamProp::TsParamProp(ts_param_prop) => {
-                            if let TsParamPropParam::Ident(ident) = &ts_param_prop.param {
-                                if let Some(ident_type) = extract_ident_type_ann(&ident.type_ann) {
-                                    // Add the type to the list of constructor arguments
-                                    ctor_args.push(ident_type);
+                            match &ts_param_prop.param {
+                                TsParamPropParam::Ident(ident) => {
+                                    if let Some(ident_type) =
+                                        extract_ident_type_ann(&ident.type_ann)
+                                    {
+                                        // Add the type to the list of constructor arguments
+                                        ctor_args.push(ident_type);
+                                    }
                                 }
+                                TsParamPropParam::Assign(_) => {}
                             }
                         }
                         ParamOrTsParamProp::Param(param) => match &param.pat {

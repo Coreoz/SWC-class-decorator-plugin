@@ -15,9 +15,9 @@ class SampleApi {
         return this.sampleApi.sample(name);
     }
     static get [Symbol.for("___CTOR_ARGS___")]() {
-      return [
-          "SampleApi"
-      ];
+        return [
+            "SampleApi"
+        ];
     }
     static get [Symbol.for("___CTOR_NAME___")]() {
         return "SampleService";
